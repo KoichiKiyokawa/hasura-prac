@@ -49,3 +49,29 @@
           name: posts
         column_mapping:
           id: user_id
+  insert_permissions:
+  - role: user
+    permission:
+      check: {}
+      columns:
+      - birthday
+      - name
+      backend_only: false
+  select_permissions:
+  - role: user
+    permission:
+      columns:
+      - birthday
+      - created_at
+      - id
+      - name
+      - updated_at
+      filter: {}
+  update_permissions:
+  - role: user
+    permission:
+      columns:
+      - birthday
+      - name
+      filter: {}
+      check: null
