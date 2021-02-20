@@ -1,3 +1,51 @@
 - table:
     schema: public
+    name: followings
+  object_relationships:
+  - name: user
+    using:
+      foreign_key_constraint_on: from_user_id
+  - name: userByToUserId
+    using:
+      foreign_key_constraint_on: to_user_id
+- table:
+    schema: public
+    name: posts
+  object_relationships:
+  - name: user
+    using:
+      foreign_key_constraint_on: user_id
+- table:
+    schema: public
     name: users
+  array_relationships:
+  - name: followers
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: followings
+        column_mapping:
+          id: to_user_id
+  - name: followings
+    using:
+      foreign_key_constraint_on:
+        column: from_user_id
+        table:
+          schema: public
+          name: followings
+  - name: followingsByToUserId
+    using:
+      foreign_key_constraint_on:
+        column: to_user_id
+        table:
+          schema: public
+          name: followings
+  - name: posts
+    using:
+      manual_configuration:
+        remote_table:
+          schema: public
+          name: posts
+        column_mapping:
+          id: user_id
