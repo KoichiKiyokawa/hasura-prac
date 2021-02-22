@@ -1,24 +1,20 @@
-import * as functions from 'firebase-functions'
-import * as admin from 'firebase-admin'
+import glob = require('tiny-glob/sync')
+import * as ModuleAlias from 'module-alias'
 
-admin.initializeApp()
-const auth = admin.auth()
+ModuleAlias.addAliases({
+  '~': __dirname, // alias for backend
+  '@': __dirname + '/../../src', // alias for frontend
+})
 
-export const signup = functions.region('asia-northeast1').https.onRequest(async (req, res) => {
-  if (req.method !== 'POST') res.status(404).send('invalid method')
+glob('./src/controllers/**/*.ts').forEach((path) => {
+  const funcName = path.match(/([a-zA-Z]+)\.ts/)?.[1]
 
-  const { email, password } = req.body as { email: string; password: string }
-  const user = await admin.auth().createUser({ email, password })
+  if (funcName == null) return
 
-  await auth.setCustomUserClaims(user.uid, {
-    'https://hasura.io/jwt/claims': {
-      'x-hasura-default-role': 'user',
-      'x-hasura-allowed-roles': ['user'],
-      'x-hasura-user-id': user.uid,
-    },
-  })
-
-  const accessToken = await auth.createCustomToken(user.uid)
-
-  res.status(200).send({ accessToken })
+  const executingFuncName = process.env.K_SERVICE
+  if (executingFuncName == null || executingFuncName === funcName) {
+    const pathInLibDir = './' + path.replace('src/', '').replace('.ts', '')
+    console.log({ funcName, pathInLibDir })
+    exports[funcName] = require(pathInLibDir)[funcName]
+  }
 })
