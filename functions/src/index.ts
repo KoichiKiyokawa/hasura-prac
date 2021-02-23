@@ -1,10 +1,4 @@
 import glob = require('tiny-glob/sync')
-import * as ModuleAlias from 'module-alias'
-
-ModuleAlias.addAliases({
-  '~': __dirname, // alias for backend
-  '@': __dirname + '/../../src', // alias for frontend
-})
 
 glob('./src/controllers/**/*.ts').forEach((path) => {
   const funcName = path.match(/([a-zA-Z]+)\.ts/)?.[1]
